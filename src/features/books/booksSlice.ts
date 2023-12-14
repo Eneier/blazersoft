@@ -1,6 +1,8 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
+import { v4 as uuid } from "uuid";
 
 export interface IBook {
+    id: string,
     name: string;
     price: number;
     category: string;
@@ -13,7 +15,7 @@ export interface IBooksState {
 
 const initialState: IBooksState = {
     books: [
-        {name: 'Alice1', price: 200, category: 'Fantasy', description: 'very nice book'},
+        {id: uuid(), name: 'Alice1', price: 200, category: 'Fantasy', description: 'very nice book'},
     ],
 };
 
@@ -26,17 +28,19 @@ export const booksSlice = createSlice({
             return state;
         },
         updateBook: (state: IBooksState, action: PayloadAction<IBook>): IBooksState => {
-            const updatedIndex = state.books.findIndex((book) => book.name === action.payload.name);
-
+            const updatedIndex = state.books.findIndex((book) => book.id === action.payload.id);
             if (updatedIndex !== -1) {
-                state.books = state.books.map((book, index) =>
-                    index === updatedIndex ? action.payload : book
-                );
+                return {
+                    ...state,
+                    books: state.books.map((book, index) =>
+                        index === updatedIndex ? action.payload : book
+                    ),
+                };
             }
             return state;
         },
-        removeBook: (state: IBooksState, action: PayloadAction<string>): IBooksState => {
-            state.books = state.books.filter((book) => book.name !== action.payload);
+        removeBook: (state: IBooksState, action: PayloadAction<IBook>): IBooksState => {
+            state.books = state.books.filter((book) => book.id !== action.payload.id);
             return state;
         },
     },

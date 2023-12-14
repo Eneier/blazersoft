@@ -11,7 +11,7 @@ const Layout: React.FC<ILayout> = ({children}) => {
         <>
             <CssBaseline/>
             <Container
-                maxWidth="md"
+                maxWidth="sm"
                 sx={{
                     display: 'flex',
                     flexDirection: 'column',

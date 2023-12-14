@@ -5,8 +5,9 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import { TextareaAutosize, TextField } from "@mui/material";
 import { useState } from "react";
-import {addBook, IBook} from "../../features/books/booksSlice";
+import {addBook, IBook, updateBook} from "../../features/books/booksSlice";
 import {useAppDispatch} from "../../hooks/hooks";
+import { v4 as uuid } from "uuid";
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -23,9 +24,16 @@ const style = {
     p: 4,
 };
 
-const BasicModal: React.FC = () => {
-    const [open, setOpen] = useState<boolean>(false);
+interface IModal {
+    open: boolean,
+    handleOpen: () => void,
+    handleClose: () => void,
+    book?: IBook
+}
+
+const BasicModal: React.FC<IModal> = ({open, handleOpen, handleClose, book}) => {
     const [newBook, setNewBook] = useState<IBook>({
+        id: '',
         name: '',
         price: 0,
         category: '',
@@ -33,21 +41,38 @@ const BasicModal: React.FC = () => {
     });
 
 
-    const handleOpen = (): void => setOpen(true);
-    const handleClose = (): void => setOpen(false);
+    React.useEffect(() => {
+        if (book) {
+            setNewBook(book);
+        }
+    }, [book]);
+
     const dispatch = useAppDispatch()
 
-    const addNewBook = (): void => {
+    const addOrUpdateBook = (): void => {
         if (newBook.name.length > 0 && newBook.price > 0 && newBook.category.length > 0) {
-            dispatch(addBook(newBook))
+            const bookToAddOrUpdate: IBook = {
+                ...newBook,
+                id: uuid()
+            };
+
+            if (book) {
+                dispatch(updateBook(newBook));
+            } else {
+                dispatch(addBook(bookToAddOrUpdate));
+            }
+
             setNewBook({
+                id: '',
                 name: '',
                 price: 0,
                 category: '',
                 description: ''
-            })
+            });
             handleClose();
-        } else  alert('The field must be filled')
+        } else {
+            alert('All fields must be filled');
+        }
     }
 
     return (
@@ -61,7 +86,7 @@ const BasicModal: React.FC = () => {
             >
                 <Box sx={style} component="form">
                     <Typography id="modal-modal-title" variant="h6" component="h2">
-                        Add Book Details
+                        {book ? 'Edit Book' : 'Add Book'}
                     </Typography>
                     <TextField
                         onChange={(e) => setNewBook({ ...newBook, name: e.target.value })}
@@ -69,6 +94,7 @@ const BasicModal: React.FC = () => {
                         label="Name"
                         variant="outlined"
                         required
+                        value={newBook.name}
                     />
                     <TextField
                         onChange={(e) => setNewBook({ ...newBook, price: parseFloat(e.target.value) })}
@@ -77,6 +103,7 @@ const BasicModal: React.FC = () => {
                         label="Price"
                         variant="outlined"
                         required
+                        value={newBook.price}
                     />
                     <TextField
                         onChange={(e) => setNewBook({ ...newBook, category: e.target.value })}
@@ -84,13 +111,15 @@ const BasicModal: React.FC = () => {
                         label="Category"
                         variant="outlined"
                         required
+                        value={newBook.category}
                     />
                     <TextareaAutosize
                         onChange={(e) => setNewBook({ ...newBook, description: e.target.value })}
                         minRows="10"
                         id="outlined-basic"
+                        value={newBook.description}
                     />
-                    <Button variant="contained" onClick={addNewBook}>Add Book</Button>
+                    <Button variant="contained" onClick={addOrUpdateBook}> {book ? 'Save Changes' : 'Add Book'}</Button>
                 </Box>
             </Modal>
         </div>

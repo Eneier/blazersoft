@@ -10,25 +10,27 @@ import {useAppDispatch} from "../../hooks/hooks";
 interface BookItemProps {
     key: string;
     book: IBook;
+    onEdit: (book: IBook) => void;
 }
 
-const CardItem: React.FC<BookItemProps> = ({book}) => {
+const CardItem: React.FC<BookItemProps> = ({book, onEdit}) => {
 
     const dispatch = useAppDispatch()
 
     const deleteBook = (): void => {
-        dispatch(removeBook(book.name))
+        dispatch(removeBook(book))
     }
 
-    const updateBook = () => {
-
-    }
+    const updateBook = (): void => {
+        onEdit(book);
+    };
 
     return (
         <Card sx={{
             display: 'flex',
             marginTop: '30px',
             justifyContent: 'space-between',
+            alignItems: 'baseline',
             padding: '10px',
             border: '3px solid #1976d2',
             borderRadius: '10px'
@@ -36,8 +38,8 @@ const CardItem: React.FC<BookItemProps> = ({book}) => {
         >
             <Box sx={{display: 'flex', flexDirection: 'column'}}>
                 <CardContent sx={{flex: '1 0 auto'}}>
-                    <Typography component="div" variant="h5">
-                        <strong onClick={updateBook}>Name: </strong>{book.name}
+                    <Typography component="div" variant="h5" onClick={updateBook} style={{ cursor: 'pointer' }}>
+                        <strong>Name: </strong>{book.name}
                     </Typography>
                     <Typography variant="subtitle1" color="text.secondary" component="div">
                         <strong>Price: </strong>{book.price}
@@ -49,8 +51,8 @@ const CardItem: React.FC<BookItemProps> = ({book}) => {
                         <strong>Description: </strong>{book.description}
                     </Typography>
                 </CardContent>
-                <Button variant="contained" onClick={deleteBook}>Delete</Button>
             </Box>
+            <Button variant="outlined" color="error" onClick={deleteBook} sx={{width: '100px', height: '30px'}}>Delete</Button>
         </Card>
     );
 }
