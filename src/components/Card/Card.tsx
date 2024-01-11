@@ -44,7 +44,7 @@ const Card: React.FC = () => {
                     <CardItem key={book.id} book={book} onEdit={handleEditBook}/>
                 ))
             ) : (
-               <EmptyBox title='No Books' />
+               <EmptyBox title='No Books for now' />
             )}
         </Box>
     );
